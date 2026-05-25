@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   AUTH_ACCOUNT_COOKIE_NAME,
   AUTH_COOKIE_NAME,
+  createAccountToken,
   createSessionToken,
+  getAccountDuration,
   getSessionDuration,
   isEmailAllowed,
   validateEmail,
-  verifyAccountCredentials,
 } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -29,26 +30,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Denne eposten har ikke tilgang" }, { status: 403 });
   }
 
-  const accountToken = request.cookies.get(AUTH_ACCOUNT_COOKIE_NAME)?.value;
-  const valid = await verifyAccountCredentials(accountToken, email, password);
-
-  if (!valid) {
-    return NextResponse.json(
-      { message: "Fant ikke konto eller feil passord. Registrer deg forst." },
-      { status: 401 }
-    );
+  if (password.length < 8) {
+    return NextResponse.json({ message: "Passord ma vaere minst 8 tegn" }, { status: 400 });
   }
 
+  const accountToken = await createAccountToken(email, password);
   const sessionToken = await createSessionToken(email);
 
-  if (!sessionToken) {
+  if (!accountToken || !sessionToken) {
     return NextResponse.json(
-      { message: "Kunne ikke opprette sesjon. Sett AUTH_SECRET i miljo-variabler." },
+      { message: "Kunne ikke opprette konto. Sett AUTH_SECRET i miljo-variabler." },
       { status: 500 }
     );
   }
 
   const response = NextResponse.json({ ok: true });
+
+  response.cookies.set({
+    name: AUTH_ACCOUNT_COOKIE_NAME,
+    value: accountToken,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: getAccountDuration(),
+  });
+
   response.cookies.set({
     name: AUTH_COOKIE_NAME,
     value: sessionToken,

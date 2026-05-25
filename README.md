@@ -48,23 +48,29 @@ Aapne `http://localhost:3000`.
 
 ## Innlogging
 
-Applikasjonen er beskyttet med registrering og epostverifisering.
+Applikasjonen er beskyttet med registrering og innlogging.
 
 1. Kopier `.env.example` til `.env.local`.
 2. Sett verdier for:
 	- `AUTH_SECRET`
 	- `ALLOWED_EMAIL`
+
+Passordflyt (anbefalt for rask oppstart):
+
+1. Gaa til `/login`.
+2. Velg `Registrer` for a opprette konto.
+3. Bruk samme epost/passord i `Passord`-fanen for senere innlogging.
+
+Valgfri epostkodeflyt (krever SMTP):
 	- `SMTP_HOST`
 	- `SMTP_PORT`
 	- `SMTP_USER`
 	- `SMTP_PASS`
 	- `SMTP_FROM`
 
-Flyt:
-
-1. Gaa til `/login`.
+1. Velg `Epostkode` i `/login`.
 2. Skriv epost og velg "Send kode".
-3. Bekreft koden fra Gmail for a fullfore registrering/innlogging.
+3. Bekreft koden fra Gmail for a fullfore innlogging.
 
 Hvis `ALLOWED_EMAIL` er satt, er kun den eposten tillatt.
 

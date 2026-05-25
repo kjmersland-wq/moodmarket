@@ -2,14 +2,18 @@
 
 import { FormEvent, useState } from "react";
 import { motion } from "framer-motion";
-import { LockKeyhole } from "lucide-react";
+import { LockKeyhole, MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type Mode = "register" | "login" | "email";
+
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("register");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,12 +22,78 @@ export default function LoginPage() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mode === "register") {
+      await registerWithPassword();
+      return;
+    }
+
+    if (mode === "login") {
+      await loginWithPassword();
+      return;
+    }
+
     if (!codeSent) {
       await sendCode();
       return;
     }
 
     await verifyCode();
+  }
+
+  async function registerWithPassword() {
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        setError(data.message ?? "Kunne ikke registrere konto");
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError("Noe gikk galt. Prov igjen.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loginWithPassword() {
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        setError(data.message ?? "Kunne ikke logge inn");
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError("Noe gikk galt. Prov igjen.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function sendCode() {
@@ -98,8 +168,53 @@ export default function LoginPage() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">MoodMarket</p>
-            <h1 className="text-2xl font-semibold text-zinc-50">Registrer deg med Gmail</h1>
+            <h1 className="text-2xl font-semibold text-zinc-50">Logg inn</h1>
           </div>
+        </div>
+
+        <div className="mb-4 grid grid-cols-3 gap-2 rounded-xl border border-white/10 bg-black/20 p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("register");
+              setCodeSent(false);
+              setError(null);
+              setSuccess(null);
+            }}
+            className={`rounded-lg px-2 py-1.5 text-xs transition ${
+              mode === "register" ? "bg-cyan-400/20 text-cyan-100" : "text-zinc-300 hover:text-zinc-100"
+            }`}
+          >
+            Registrer
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setCodeSent(false);
+              setError(null);
+              setSuccess(null);
+            }}
+            className={`rounded-lg px-2 py-1.5 text-xs transition ${
+              mode === "login" ? "bg-cyan-400/20 text-cyan-100" : "text-zinc-300 hover:text-zinc-100"
+            }`}
+          >
+            Passord
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode("email");
+              setError(null);
+              setSuccess(null);
+            }}
+            className={`inline-flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-xs transition ${
+              mode === "email" ? "bg-cyan-400/20 text-cyan-100" : "text-zinc-300 hover:text-zinc-100"
+            }`}
+          >
+            <MailCheck className="h-3.5 w-3.5" />
+            Epostkode
+          </button>
         </div>
 
         <form className="space-y-3" onSubmit={onSubmit}>
@@ -119,7 +234,25 @@ export default function LoginPage() {
             />
           </div>
 
-          {codeSent ? (
+          {mode !== "email" ? (
+            <div className="space-y-1">
+              <label className="text-sm text-zinc-300" htmlFor="password">
+                Passord
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Minst 8 tegn"
+                autoComplete={mode === "register" ? "new-password" : "current-password"}
+                required
+                disabled={loading}
+              />
+            </div>
+          ) : null}
+
+          {mode === "email" && codeSent ? (
             <div className="space-y-1">
               <label className="text-sm text-zinc-300" htmlFor="code">
                 Verifiseringskode
@@ -139,10 +272,18 @@ export default function LoginPage() {
           {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Behandler..." : codeSent ? "Bekreft og ga videre" : "Send kode"}
+            {loading
+              ? "Behandler..."
+              : mode === "register"
+                ? "Registrer konto"
+                : mode === "login"
+                  ? "Logg inn"
+                  : codeSent
+                    ? "Bekreft og ga videre"
+                    : "Send kode"}
           </Button>
 
-          {codeSent ? (
+          {mode === "email" && codeSent ? (
             <button
               type="button"
               onClick={sendCode}
@@ -152,6 +293,14 @@ export default function LoginPage() {
               Send ny kode
             </button>
           ) : null}
+
+          {mode !== "email" ? (
+            <p className="text-xs text-zinc-400">
+              Kontoen lagres privat i denne nettleseren og er kun tilgjengelig for tillatt epost.
+            </p>
+          ) : (
+            <p className="text-xs text-zinc-400">Epostkode krever SMTP-oppsett i deploy-miljo.</p>
+          )}
         </form>
       </motion.section>
     </main>

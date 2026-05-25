@@ -1,5 +1,6 @@
 export const AUTH_COOKIE_NAME = "moodmarket_session";
 export const AUTH_PENDING_COOKIE_NAME = "moodmarket_pending";
+export const AUTH_ACCOUNT_COOKIE_NAME = "moodmarket_account";
 
 type SessionPayload = {
   email: string;
@@ -9,6 +10,12 @@ type SessionPayload = {
 type PendingPayload = {
   email: string;
   codeHash: string;
+  exp: number;
+};
+
+type AccountPayload = {
+  email: string;
+  passwordHash: string;
   exp: number;
 };
 
@@ -55,7 +62,23 @@ function fromBase64Url(value: string) {
 }
 
 function getAuthSecret() {
-  return process.env.AUTH_SECRET || null;
+  const explicit = process.env.AUTH_SECRET;
+  if (explicit) return explicit;
+
+  const vercelId =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_URL;
+
+  if (vercelId) {
+    return `moodmarket-${vercelId}`;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "moodmarket-dev-fallback-secret";
+  }
+
+  return null;
 }
 
 async function signData(payloadBase64: string, secret: string) {
@@ -132,6 +155,32 @@ export async function validateSessionToken(token?: string | null) {
   return true;
 }
 
+export async function hashPassword(password: string) {
+  return sha256(password);
+}
+
+export async function createAccountToken(email: string, password: string) {
+  const payload: AccountPayload = {
+    email,
+    passwordHash: await hashPassword(password),
+    exp: Date.now() + 1000 * 60 * 60 * 24 * 365,
+  };
+
+  return createSignedToken(payload);
+}
+
+export async function verifyAccountCredentials(
+  accountToken: string | null | undefined,
+  email: string,
+  password: string
+) {
+  const payload = await parseSignedToken<AccountPayload>(accountToken);
+  if (!payload) return false;
+
+  const passwordHash = await hashPassword(password);
+  return payload.exp > Date.now() && payload.email === email && payload.passwordHash === passwordHash;
+}
+
 export function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -153,4 +202,8 @@ export function getSessionDuration() {
 
 export function getPendingDuration() {
   return 60 * 10;
+}
+
+export function getAccountDuration() {
+  return 60 * 60 * 24 * 365;
 }
