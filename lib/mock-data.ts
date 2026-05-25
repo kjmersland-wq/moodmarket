@@ -26,6 +26,7 @@ export const trends: Trend[] = [
     sources: [
       { title: "Reddit: r/WeAreTheMusicMakers", url: "https://reddit.com", sourceType: "Reddit" },
       { title: "YouTube trendkanaler", url: "https://youtube.com", sourceType: "YouTube" },
+      { title: "GitHub: audio agent repos", url: "https://github.com", sourceType: "GitHub" },
       { title: "Tech-magasin dekning", url: "https://example.com", sourceType: "Nyheter" },
     ],
   },
@@ -54,6 +55,7 @@ export const trends: Trend[] = [
     sources: [
       { title: "Forum: RetroGamer boards", url: "https://example.com", sourceType: "Forum" },
       { title: "YouTube: Handheld reviews", url: "https://youtube.com", sourceType: "YouTube" },
+      { title: "Markedsplass: bruktpris-overvaking", url: "https://example.com", sourceType: "Markedsplass" },
       { title: "Trendmotor intern signalpakke", url: "https://example.com", sourceType: "Trendmotor" },
     ],
   },
@@ -162,6 +164,7 @@ export const trends: Trend[] = [
     useCases: ["Live commerce", "Retail-markedsforing", "Creator-salg"],
     sources: [
       { title: "Trendmotor handelssignal", url: "https://example.com", sourceType: "Trendmotor" },
+      { title: "TikTok live shopping creators", url: "https://tiktok.com", sourceType: "TikTok" },
       { title: "YouTube creators i regionen", url: "https://youtube.com", sourceType: "YouTube" },
     ],
   },
@@ -240,6 +243,7 @@ export const trends: Trend[] = [
     useCases: ["Fintech", "Privatokonomi", "Abonnementsanalyse"],
     sources: [
       { title: "Nyheter: personal finance apps", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "Podcast: household money systems", url: "https://example.com", sourceType: "Podcast" },
       { title: "Forum: budgeting communities", url: "https://example.com", sourceType: "Forum" },
     ],
   },
@@ -267,6 +271,7 @@ export const trends: Trend[] = [
     useCases: ["SMB SaaS", "Regnskap", "CFO-verktøy"],
     sources: [
       { title: "Trendmotor: B2B finance", url: "https://example.com", sourceType: "Trendmotor" },
+      { title: "X: CFO operators", url: "https://x.com", sourceType: "X" },
       { title: "Linked forums for CFO teams", url: "https://example.com", sourceType: "Forum" },
     ],
   },
@@ -294,6 +299,7 @@ export const trends: Trend[] = [
     useCases: ["Reiseliv", "Hotell og booking", "Destinasjonsmarkedsforing"],
     sources: [
       { title: "Nyheter: travel behavior shifts", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "TikTok: coolcation itineraries", url: "https://tiktok.com", sourceType: "TikTok" },
       { title: "YouTube: slow travel channels", url: "https://youtube.com", sourceType: "YouTube" },
     ],
   },
@@ -321,6 +327,7 @@ export const trends: Trend[] = [
     useCases: ["DIY-marked", "Kurs og medlemskap", "Prototypebygging"],
     sources: [
       { title: "Forum: maker communities", url: "https://example.com", sourceType: "Forum" },
+      { title: "Nyhetsbrev: indie maker dispatch", url: "https://example.com", sourceType: "Nyhetsbrev" },
       { title: "YouTube: workshop channels", url: "https://youtube.com", sourceType: "YouTube" },
     ],
   },

@@ -32,7 +32,18 @@ export type TrendSectionKey =
 export type TrendSource = {
   title: string;
   url: string;
-  sourceType: "Reddit" | "YouTube" | "Nyheter" | "Forum" | "Trendmotor";
+  sourceType:
+    | "Reddit"
+    | "YouTube"
+    | "Nyheter"
+    | "Forum"
+    | "Trendmotor"
+    | "TikTok"
+    | "X"
+    | "Podcast"
+    | "Nyhetsbrev"
+    | "GitHub"
+    | "Markedsplass";
 };
 
 export type Trend = {

@@ -20,12 +20,29 @@ MoodMarket er en moderne SaaS-inspirert webapp for tidlig oppdagelse av globale 
 
 - Ingen API-tilknytninger er brukt i denne versjonen.
 - All trenddata er lokal mockdata i `lib/mock-data.ts`.
-- Scraper-moduler er forberedt som placeholders i:
+- Scraper-moduler og signalfangst er forberedt som placeholders i:
 	- `scraper/reddit`
 	- `scraper/youtube`
 	- `scraper/news`
 	- `scraper/forums`
 	- `scraper/trends`
+	- `scraper/tiktok`
+	- `scraper/x`
+	- `scraper/podcasts`
+	- `scraper/newsletters`
+	- `scraper/github`
+	- `scraper/marketplaces`
+
+Kilder som na er klargjort for trendfangst:
+
+- Reddit og nisjeforum
+- YouTube og korte videoformater
+- Nyheter og nyhetsbrev
+- Trendmotorer og soketrender
+- X for sanntidssignaler
+- Podcasts og ekspertformat
+- GitHub for utvikleradopsjon
+- Markedsplasser for produktettersporsel
 
 ## Teknologi
 
