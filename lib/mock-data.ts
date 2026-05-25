@@ -7,6 +7,8 @@ export const trends: Trend[] = [
     category: "Musikk",
     country: "USA",
     region: "Nord-Amerika",
+    description:
+      "Agentdrevne musikkverktoy som lager demoer, stems og adaptive lydspor pa minutter for creators, byraer og indie-artister.",
     growthPercent: 148.2,
     trendScore: 93,
     strength: 91,
@@ -18,6 +20,9 @@ export const trends: Trend[] = [
     growth30d: 148.2,
     aiSummary:
       "Nye verktøy for AI-generert musikk kombineres med creator-okonomi pa korte videoformater. Det gir rask spredning i USA, Canada og Storbritannia.",
+    opportunity:
+      "Aktuelt for private creators som vil produsere raskere, og for selskaper som trenger lydidentitet, annonser og prototyper billigere.",
+    useCases: ["Musikkproduksjon", "Reklame og kampanjer", "Lydbranding"],
     sources: [
       { title: "Reddit: r/WeAreTheMusicMakers", url: "https://reddit.com", sourceType: "Reddit" },
       { title: "YouTube trendkanaler", url: "https://youtube.com", sourceType: "YouTube" },
@@ -30,6 +35,8 @@ export const trends: Trend[] = [
     category: "Spill",
     country: "Japan",
     region: "Asia",
+    description:
+      "Kompakte premium-konsoller for retrospill med modding, samlerverdi og sterk nisjelojalitet blant unge voksne.",
     growthPercent: 121.4,
     trendScore: 88,
     strength: 84,
@@ -41,6 +48,9 @@ export const trends: Trend[] = [
     growth30d: 121.4,
     aiSummary:
       "Kombinasjonen av nostalgi, samleobjekter og nye indie-utgivelser driver kraftig vekst i Japan og Sor-Korea.",
+    opportunity:
+      "Passer butikker, nettbutikker og content-skapere som vil posisjonere seg rundt samlekultur, tilbehor og retro-events.",
+    useCases: ["E-handel", "Tilbehor og samlerobjekter", "Gaming-innhold"],
     sources: [
       { title: "Forum: RetroGamer boards", url: "https://example.com", sourceType: "Forum" },
       { title: "YouTube: Handheld reviews", url: "https://youtube.com", sourceType: "YouTube" },
@@ -53,6 +63,8 @@ export const trends: Trend[] = [
     category: "Musikk",
     country: "Sverige",
     region: "Europa",
+    description:
+      "En ny scene for nordisk blues med moderne produksjon, vinylprofil og sterk live-tilstedevaerelse i mindre byer.",
     growthPercent: 94.6,
     trendScore: 82,
     strength: 73,
@@ -64,6 +76,9 @@ export const trends: Trend[] = [
     growth30d: 94.6,
     aiSummary:
       "Live-klipp pa sosiale medier og samarbeid mellom nisjeartister skaper ny interesse for moderne nordisk blues.",
+    opportunity:
+      "Relevant for festivalarrangorer, plateselskaper, kulturhus og nisjebutikker som vil fange voksende premium-publikum.",
+    useCases: ["Festivalbooking", "Merch og vinyl", "Lokal kulturprofil"],
     sources: [
       { title: "Reddit: r/Blues", url: "https://reddit.com", sourceType: "Reddit" },
       { title: "Nyhetsbrev for livescener", url: "https://example.com", sourceType: "Nyheter" },
@@ -75,6 +90,8 @@ export const trends: Trend[] = [
     category: "Helse",
     country: "Brasil",
     region: "Sor-Amerika",
+    description:
+      "Smakorte hverdagsrutiner for pust, restitusjon, mat og fokus som deles i bite-sized formater med hoy gjennomforingsgrad.",
     growthPercent: 109.1,
     trendScore: 86,
     strength: 78,
@@ -86,6 +103,9 @@ export const trends: Trend[] = [
     growth30d: 109.1,
     aiSummary:
       "Korte, daglige rutiner for stressmestring deles i hoyt tempo pa video og meldingsplattformer i Brasil og Mexico.",
+    opportunity:
+      "Gir muligheter for private coacher, helseapper, arbeidsplasser og merkevarer som vil knytte seg til enkel selvforbedring.",
+    useCases: ["Velvaere-apper", "Bedriftshelse", "Creator-programmer"],
     sources: [
       { title: "YouTube shorts om helse", url: "https://youtube.com", sourceType: "YouTube" },
       { title: "Forum for livsstilscoacher", url: "https://example.com", sourceType: "Forum" },
@@ -97,6 +117,8 @@ export const trends: Trend[] = [
     category: "Mote",
     country: "Italia",
     region: "Europa",
+    description:
+      "Diskret mote med tekniske stoffer, premium-passform og funksjonelle detaljer for urbane kunder med hoy betalingsvilje.",
     growthPercent: 76.8,
     trendScore: 79,
     strength: 69,
@@ -108,6 +130,9 @@ export const trends: Trend[] = [
     growth30d: 76.8,
     aiSummary:
       "Diskrete premium-plagg med tekniske materialer far oppmerksomhet gjennom moteuker og influencer-redaksjoner.",
+    opportunity:
+      "Sterkt spor for D2C-merker, premium-butikker og byraer som jobber med livsstilssegmentering og produktutvikling.",
+    useCases: ["D2C mote", "Premium retail", "Livsstilskampanjer"],
     sources: [
       { title: "Nyheter: moteanalyse", url: "https://example.com", sourceType: "Nyheter" },
       { title: "Reddit: r/malefashionadvice", url: "https://reddit.com", sourceType: "Reddit" },
@@ -119,6 +144,8 @@ export const trends: Trend[] = [
     category: "Sosiale medier",
     country: "Indonesia",
     region: "Asia",
+    description:
+      "Direktesendt handel der creators, butikker og mikroinfluensere selger i sanntid med sterk impulsdrift og chat-basert konvertering.",
     growthPercent: 132.7,
     trendScore: 90,
     strength: 89,
@@ -130,6 +157,9 @@ export const trends: Trend[] = [
     growth30d: 132.7,
     aiSummary:
       "Direktesending med kjop i app skalerer raskt pa tvers av byer i Sorost-Asia med hoy konvertering pa lavprisprodukter.",
+    opportunity:
+      "Svaert relevant for selskaper innen retail, markedsplasser og performance marketing som vil teste nye salgskanaler raskt.",
+    useCases: ["Live commerce", "Retail-markedsforing", "Creator-salg"],
     sources: [
       { title: "Trendmotor handelssignal", url: "https://example.com", sourceType: "Trendmotor" },
       { title: "YouTube creators i regionen", url: "https://youtube.com", sourceType: "YouTube" },
@@ -141,6 +171,8 @@ export const trends: Trend[] = [
     category: "Mat",
     country: "Kenya",
     region: "Afrika",
+    description:
+      "Matkonsepter som kombinerer lokal produksjon, robust ravaresammensetning og fortellinger om matsikkerhet og klimatilpasning.",
     growthPercent: 88.3,
     trendScore: 81,
     strength: 67,
@@ -152,6 +184,9 @@ export const trends: Trend[] = [
     growth30d: 88.3,
     aiSummary:
       "Innhold om lokale, robuste matvarer far sterk spredning gjennom utdanningsprofiler og samfunnsinitiativer.",
+    opportunity:
+      "Nyttig for private matgründere, dagligvarekonsepter og selskaper som jobber med ESG, forsyningskjeder og lokal innovasjon.",
+    useCases: ["Matstartup", "B2B innkjop", "Baerekraftprofil"],
     sources: [
       { title: "Nyheter: matsikkerhet", url: "https://example.com", sourceType: "Nyheter" },
       { title: "Forum for urban farming", url: "https://example.com", sourceType: "Forum" },
@@ -163,6 +198,8 @@ export const trends: Trend[] = [
     category: "Sport",
     country: "Australia",
     region: "Oseania",
+    description:
+      "Lokale lopemiljoer med sterk sosial identitet, estetikk og innhold som kombinerer trening, natur og community.",
     growthPercent: 67.5,
     trendScore: 74,
     strength: 61,
@@ -174,20 +211,368 @@ export const trends: Trend[] = [
     growth30d: 67.5,
     aiSummary:
       "Sosiale lopemiljoer med fokus pa kystnare opplevelser vokser jevnt gjennom arrangementer og korte video-oppsummeringer.",
+    opportunity:
+      "Bra inngang for treningsmerker, arrangementer, reisekonsepter og lokale butikker som vil bygge lojalitet over tid.",
+    useCases: ["Eventer", "Sportsutstyr", "Lokale medlemskap"],
     sources: [{ title: "Sosiale forum for loping", url: "https://example.com", sourceType: "Forum" }],
+  },
+  {
+    id: "family-budget-ai",
+    name: "Family Budget AI",
+    category: "Okonomi privat",
+    country: "Canada",
+    region: "Nord-Amerika",
+    description:
+      "Personlige okonomiverktoy som hjelper husholdninger med budsjett, abonnementskutt og smartere hverdagsvalg med AI-forslag.",
+    growthPercent: 118.6,
+    trendScore: 89,
+    strength: 83,
+    sparkline: [25, 28, 32, 39, 46, 55, 67, 78],
+    watchedBy: 1320,
+    launchedHoursAgo: 27,
+    growth24h: 22.4,
+    growth7d: 74.8,
+    growth30d: 118.6,
+    aiSummary:
+      "Renter, dyrere hverdagskostnader og behov for rask oversikt driver vekst i private okonomiassistenter i Nord-Amerika.",
+    opportunity:
+      "Relevant for banker, fintech, forsikringsselskaper og private raadgivere som vil tilby enklere hverdagsverdi til kundene.",
+    useCases: ["Fintech", "Privatokonomi", "Abonnementsanalyse"],
+    sources: [
+      { title: "Nyheter: personal finance apps", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "Forum: budgeting communities", url: "https://example.com", sourceType: "Forum" },
+    ],
+  },
+  {
+    id: "cashflow-command-centers",
+    name: "Cashflow Command Centers",
+    category: "Okonomi bedrift",
+    country: "Tyskland",
+    region: "Europa",
+    description:
+      "Dashboards som gir SMB-er sanntidskontroll pa likviditet, innbetalinger, kostnadslekkasje og scenarioanalyse.",
+    growthPercent: 112.9,
+    trendScore: 91,
+    strength: 87,
+    sparkline: [29, 31, 34, 41, 49, 58, 70, 79],
+    watchedBy: 1764,
+    launchedHoursAgo: 14,
+    growth24h: 29.7,
+    growth7d: 78.2,
+    growth30d: 112.9,
+    aiSummary:
+      "Bedrifter prioriterer presis likviditetskontroll og raskere beslutninger under usikre markedsforhold, spesielt i Europa.",
+    opportunity:
+      "Svaert relevant for SaaS-selskaper, regnskapsmiljoer, CFO-tjenester og banker mot SMB-segmentet.",
+    useCases: ["SMB SaaS", "Regnskap", "CFO-verktøy"],
+    sources: [
+      { title: "Trendmotor: B2B finance", url: "https://example.com", sourceType: "Trendmotor" },
+      { title: "Linked forums for CFO teams", url: "https://example.com", sourceType: "Forum" },
+    ],
+  },
+  {
+    id: "coolcation-planning",
+    name: "Coolcation Planning",
+    category: "Ferie",
+    country: "Island",
+    region: "Europa",
+    description:
+      "Reisetrenden der folk aktivt velger svalere destinasjoner, naturbaserte opplevelser og skuldersesong fremfor overfylte storbyer.",
+    growthPercent: 105.3,
+    trendScore: 85,
+    strength: 77,
+    sparkline: [21, 24, 28, 36, 45, 56, 62, 71],
+    watchedBy: 1040,
+    launchedHoursAgo: 30,
+    growth24h: 19.8,
+    growth7d: 63.1,
+    growth30d: 105.3,
+    aiSummary:
+      "Klimabevissthet, sommervarme og jakt pa roligere opplevelser driver ettersporsel etter svalere feriealternativer.",
+    opportunity:
+      "Sterkt spor for reiseliv, turoperatorer, hotellkonsepter og innholdsprodusenter som vil posisjonere nye destinasjoner tidlig.",
+    useCases: ["Reiseliv", "Hotell og booking", "Destinasjonsmarkedsforing"],
+    sources: [
+      { title: "Nyheter: travel behavior shifts", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "YouTube: slow travel channels", url: "https://youtube.com", sourceType: "YouTube" },
+    ],
+  },
+  {
+    id: "weekend-maker-labs",
+    name: "Weekend Maker Labs",
+    category: "Hobby",
+    country: "Nederland",
+    region: "Europa",
+    description:
+      "Fysiske og digitale maker-miljoer der folk bygger smarte hjemmelosninger, 3D-printede produkter og mikroselskaper pa fritiden.",
+    growthPercent: 97.2,
+    trendScore: 80,
+    strength: 72,
+    sparkline: [19, 20, 24, 30, 37, 44, 53, 61],
+    watchedBy: 760,
+    launchedHoursAgo: 52,
+    growth24h: 15.1,
+    growth7d: 47.9,
+    growth30d: 97.2,
+    aiSummary:
+      "DIY-teknologi og skaperglede flyter sammen med sideprosjekter, lokale verksteder og deling av byggelogger pa video.",
+    opportunity:
+      "Interessant for hobbybutikker, kursleverandorer, utstyrsmerker og B2B-selskaper som vil teste community-drevet innovasjon.",
+    useCases: ["DIY-marked", "Kurs og medlemskap", "Prototypebygging"],
+    sources: [
+      { title: "Forum: maker communities", url: "https://example.com", sourceType: "Forum" },
+      { title: "YouTube: workshop channels", url: "https://youtube.com", sourceType: "YouTube" },
+    ],
+  },
+  {
+    id: "solar-home-bundles",
+    name: "Solar Home Bundles",
+    category: "Okonomi privat",
+    country: "Spania",
+    region: "Europa",
+    description:
+      "Pakker for privat husholdning som kombinerer solceller, hjemmelagring og appstyring for a redusere energikostnader.",
+    growthPercent: 92.4,
+    trendScore: 84,
+    strength: 75,
+    sparkline: [20, 22, 27, 31, 38, 47, 55, 63],
+    watchedBy: 1128,
+    launchedHoursAgo: 41,
+    growth24h: 17.9,
+    growth7d: 52.4,
+    growth30d: 92.4,
+    aiSummary:
+      "Hoyere energipriser og okende modenhet i hjemmeenergi driver sterk interesse fra private boligeiere i Sor-Europa.",
+    opportunity:
+      "Gir rom for installatorer, energiselskaper, finansieringspartnere og forsikringstilbud rettet mot boligmarkedet.",
+    useCases: ["Energisalg", "Boligfinans", "Hjemmeautomasjon"],
+    sources: [
+      { title: "Nyheter: home energy adoption", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "Trendmotor: green households", url: "https://example.com", sourceType: "Trendmotor" },
+    ],
+  },
+  {
+    id: "remote-team-retreats",
+    name: "Remote Team Retreats",
+    category: "Ferie",
+    country: "Portugal",
+    region: "Europa",
+    description:
+      "Hybrid mellom ferie og arbeid der selskaper samler team til korte retreats med fokus pa kultur, strategi og lav friksjon.",
+    growthPercent: 101.8,
+    trendScore: 87,
+    strength: 80,
+    sparkline: [23, 26, 30, 38, 45, 54, 63, 74],
+    watchedBy: 1386,
+    launchedHoursAgo: 24,
+    growth24h: 20.7,
+    growth7d: 61.7,
+    growth30d: 101.8,
+    aiSummary:
+      "Distribuerte team vil fortsatt møtes fysisk, men na mer komprimert og opplevelsesbasert enn gjennom tradisjonelle konferanser.",
+    opportunity:
+      "Relevante spor for hotell, B2B-reise, HR-tech, coworking og eventpartnere som vil eie retreat-markedet.",
+    useCases: ["B2B reise", "HR og kultur", "Eventproduksjon"],
+    sources: [
+      { title: "Nyheter: future of work travel", url: "https://example.com", sourceType: "Nyheter" },
+      { title: "Forum: remote founders", url: "https://example.com", sourceType: "Forum" },
+    ],
+  },
+  {
+    id: "pet-wellness-subscriptions",
+    name: "Pet Wellness Subscriptions",
+    category: "Hobby",
+    country: "Storbritannia",
+    region: "Europa",
+    description:
+      "Abonnement og innhold rundt helse, aktivisering og premium-produkter for kjaledyr som del av livsstilsokonomien.",
+    growthPercent: 86.7,
+    trendScore: 78,
+    strength: 68,
+    sparkline: [18, 21, 23, 27, 33, 39, 46, 54],
+    watchedBy: 970,
+    launchedHoursAgo: 58,
+    growth24h: 14.2,
+    growth7d: 40.8,
+    growth30d: 86.7,
+    aiSummary:
+      "Dyreeiere prioriterer premium helseprodukter og lojalitetsmodeller, og driver jevn vekst i abonnementskonsepter.",
+    opportunity:
+      "God match for D2C, veterinartjenester, forsikring og retail som vil bygge gjentakende inntekter.",
+    useCases: ["Abonnement", "Pet retail", "Forsikring og helse"],
+    sources: [
+      { title: "YouTube: pet lifestyle creators", url: "https://youtube.com", sourceType: "YouTube" },
+      { title: "Reddit: r/dogs business trends", url: "https://reddit.com", sourceType: "Reddit" },
+    ],
   },
 ];
 
 export const countryHeat: CountryHeat[] = [
-  { country: "USA", code: "US", x: 21, y: 38, heat: 94, label: "AI Music", featuredTrends: ["AI Music Agents", "Social Shopping Live"] },
-  { country: "Canada", code: "CA", x: 20, y: 26, heat: 68, label: "Creator Tools", featuredTrends: ["AI Music Agents"] },
-  { country: "Brasil", code: "BR", x: 33, y: 62, heat: 79, label: "Micro Wellness", featuredTrends: ["Micro Wellness Habits"] },
-  { country: "Sverige", code: "SE", x: 51, y: 26, heat: 73, label: "Nordisk Blues", featuredTrends: ["Nordic Blues Wave"] },
-  { country: "Italia", code: "IT", x: 53, y: 35, heat: 65, label: "Techwear", featuredTrends: ["Silent Luxury Techwear"] },
-  { country: "Kenya", code: "KE", x: 58, y: 56, heat: 61, label: "Smart Food", featuredTrends: ["Climate Smart Food"] },
-  { country: "Japan", code: "JP", x: 81, y: 38, heat: 91, label: "Retro Gaming", featuredTrends: ["Retro Gaming Handhelds"] },
-  { country: "Indonesia", code: "ID", x: 77, y: 54, heat: 89, label: "Live Commerce", featuredTrends: ["Social Shopping Live"] },
-  { country: "Australia", code: "AU", x: 84, y: 73, heat: 58, label: "Run Clubs", featuredTrends: ["Coastal Running Clubs"] },
+  {
+    country: "USA",
+    code: "US",
+    region: "Nord-Amerika",
+    x: 20,
+    y: 34,
+    heat: 94,
+    label: "AI Music",
+    description: "Sterk oppbygging innen creator-okonomi, lydverktoy og premium AI-produkter.",
+    featuredTrends: ["AI Music Agents"],
+  },
+  {
+    country: "Canada",
+    code: "CA",
+    region: "Nord-Amerika",
+    x: 18,
+    y: 22,
+    heat: 73,
+    label: "Family Finance",
+    description: "Husholdningsokonomi og digitale spareverktoy vokser raskt.",
+    featuredTrends: ["Family Budget AI"],
+  },
+  {
+    country: "Brasil",
+    code: "BR",
+    region: "Sor-Amerika",
+    x: 30,
+    y: 62,
+    heat: 79,
+    label: "Wellness",
+    description: "Korte velvaererutiner sprer seg bredt gjennom sosiale formater.",
+    featuredTrends: ["Micro Wellness Habits"],
+  },
+  {
+    country: "Storbritannia",
+    code: "GB",
+    region: "Europa",
+    x: 46,
+    y: 24,
+    heat: 69,
+    label: "Pet Economy",
+    description: "Premium kjaledyrtjenester og abonnement trekker oppmerksomhet.",
+    featuredTrends: ["Pet Wellness Subscriptions"],
+  },
+  {
+    country: "Sverige",
+    code: "SE",
+    region: "Europa",
+    x: 51,
+    y: 18,
+    heat: 73,
+    label: "Nordisk Blues",
+    description: "Nisjemusikk og kulturindustri fanger internasjonal interesse.",
+    featuredTrends: ["Nordic Blues Wave"],
+  },
+  {
+    country: "Tyskland",
+    code: "DE",
+    region: "Europa",
+    x: 49,
+    y: 28,
+    heat: 88,
+    label: "Cashflow SaaS",
+    description: "SMB-er overvaker likviditet og effektivitet tettere enn tidligere.",
+    featuredTrends: ["Cashflow Command Centers"],
+  },
+  {
+    country: "Nederland",
+    code: "NL",
+    region: "Europa",
+    x: 47,
+    y: 27,
+    heat: 67,
+    label: "Maker Labs",
+    description: "Hobby, DIY og produktbygging smelter sammen med sideprosjekter.",
+    featuredTrends: ["Weekend Maker Labs"],
+  },
+  {
+    country: "Spania",
+    code: "ES",
+    region: "Europa",
+    x: 46,
+    y: 36,
+    heat: 72,
+    label: "Solar Homes",
+    description: "Private energilosninger vekker sterk interesse i solrike markeder.",
+    featuredTrends: ["Solar Home Bundles"],
+  },
+  {
+    country: "Italia",
+    code: "IT",
+    region: "Europa",
+    x: 52,
+    y: 34,
+    heat: 65,
+    label: "Techwear",
+    description: "Premium mote med funksjon og diskré luksus holder veksten oppe.",
+    featuredTrends: ["Silent Luxury Techwear"],
+  },
+  {
+    country: "Portugal",
+    code: "PT",
+    region: "Europa",
+    x: 43,
+    y: 38,
+    heat: 76,
+    label: "Team Retreats",
+    description: "Retreat-markedet vokser som krysspunkt mellom reise og bedriftskultur.",
+    featuredTrends: ["Remote Team Retreats"],
+  },
+  {
+    country: "Island",
+    code: "IS",
+    region: "Europa",
+    x: 40,
+    y: 15,
+    heat: 70,
+    label: "Coolcation",
+    description: "Svalere ferieformer og naturbaserte reiser far fornyet ettersporsel.",
+    featuredTrends: ["Coolcation Planning"],
+  },
+  {
+    country: "Kenya",
+    code: "KE",
+    region: "Afrika",
+    x: 57,
+    y: 57,
+    heat: 61,
+    label: "Smart Food",
+    description: "Matinnovasjon og lokal robusthet blir stadig mer strategisk viktig.",
+    featuredTrends: ["Climate Smart Food"],
+  },
+  {
+    country: "Japan",
+    code: "JP",
+    region: "Asia",
+    x: 82,
+    y: 33,
+    heat: 91,
+    label: "Retro Gaming",
+    description: "Nostalgi, samlerkultur og hardware-fornyelse holder farten oppe.",
+    featuredTrends: ["Retro Gaming Handhelds"],
+  },
+  {
+    country: "Indonesia",
+    code: "ID",
+    region: "Asia",
+    x: 76,
+    y: 56,
+    heat: 89,
+    label: "Live Commerce",
+    description: "Sosial handel blir en av de mest aggressive vekstflatene i regionen.",
+    featuredTrends: ["Social Shopping Live"],
+  },
+  {
+    country: "Australia",
+    code: "AU",
+    region: "Oseania",
+    x: 84,
+    y: 76,
+    heat: 58,
+    label: "Run Clubs",
+    description: "Community-baserte treningsmiljoer fortsetter a ta markedsoppmerksomhet.",
+    featuredTrends: ["Coastal Running Clubs"],
+  },
 ];
 
 export const regions = [
@@ -210,4 +595,8 @@ export const categories = [
   "Sosiale medier",
   "Sport",
   "Helse",
+  "Okonomi privat",
+  "Okonomi bedrift",
+  "Ferie",
+  "Hobby",
 ] as const;

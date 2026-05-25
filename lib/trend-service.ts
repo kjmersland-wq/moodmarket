@@ -63,7 +63,16 @@ export function searchTrends(query: string, region: RegionFilter, category: Tren
     const queryMatch =
       normalized.length === 0
         ? true
-        : [trend.name, trend.country, trend.category, trend.region]
+        : [
+            trend.name,
+            trend.country,
+            trend.category,
+            trend.region,
+            trend.description,
+            trend.aiSummary,
+            trend.opportunity,
+            ...trend.useCases,
+          ]
             .join(" ")
             .toLowerCase()
             .includes(normalized);

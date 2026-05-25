@@ -21,7 +21,7 @@ export default function UtforskPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">Utforsk</p>
           <h2 className="text-3xl font-semibold text-zinc-50 md:text-4xl">Sok etter globale trender</h2>
           <p className="max-w-2xl text-sm text-zinc-300 md:text-base">
-            Filtrer raskt pa region og kategori for a finne signalene som vokser for resten av verden.
+            Filtrer raskt pa region og kategori for a finne signaler innen okonomi, ferie, hobby, teknologi og andre globale markeder.
           </p>
         </header>
 

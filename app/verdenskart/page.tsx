@@ -9,7 +9,7 @@ export default function VerdenskartPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">Verdenskart</p>
           <h2 className="text-3xl font-semibold text-zinc-50 md:text-4xl">Interaktiv varmevisning av globale signaler</h2>
           <p className="max-w-2xl text-sm text-zinc-300 md:text-base">
-            Klikk pa landene for a se hvilke trender som vokser raskest i hvert marked.
+            Velg ett eller flere land og bytt mellom kontinenter for a se hvilke trender som vokser raskest i hvert marked.
           </p>
         </header>
         <WorldMap />

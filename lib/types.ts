@@ -7,7 +7,11 @@ export type TrendCategory =
   | "Livsstil"
   | "Sosiale medier"
   | "Sport"
-  | "Helse";
+  | "Helse"
+  | "Okonomi privat"
+  | "Okonomi bedrift"
+  | "Ferie"
+  | "Hobby";
 
 export type RegionFilter =
   | "Hele verden"
@@ -37,6 +41,7 @@ export type Trend = {
   category: TrendCategory;
   country: string;
   region: RegionFilter;
+  description: string;
   growthPercent: number;
   trendScore: number;
   strength: number;
@@ -47,15 +52,19 @@ export type Trend = {
   growth7d: number;
   growth30d: number;
   aiSummary: string;
+  opportunity: string;
+  useCases: string[];
   sources: TrendSource[];
 };
 
 export type CountryHeat = {
   country: string;
   code: string;
+  region: RegionFilter;
   x: number;
   y: number;
   heat: number;
   label: string;
+  description: string;
   featuredTrends: string[];
 };

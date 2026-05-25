@@ -33,11 +33,10 @@ export default async function TrendDetailPage({ params }: TrendDetailPageProps) 
             <div className="flex flex-wrap items-center gap-2">
               <Badge>{trend.category}</Badge>
               <Badge className="text-cyan-100">{trend.country}</Badge>
+              <Badge className="text-zinc-200">{trend.region}</Badge>
             </div>
             <h2 className="text-3xl font-semibold text-zinc-50 md:text-4xl">{trend.name}</h2>
-            <p className="text-sm text-zinc-300 md:text-base">
-              Denne trenden viser tydelig global momentum med sterke signaler pa tvers av flere kilder.
-            </p>
+            <p className="text-sm text-zinc-300 md:text-base">{trend.description}</p>
             <div className="grid gap-3 sm:grid-cols-3">
               <Metric label="Siste 24 timer" value={formatPercent(trend.growth24h)} />
               <Metric label="Siste 7 dager" value={formatPercent(trend.growth7d)} />
@@ -64,6 +63,21 @@ export default async function TrendDetailPage({ params }: TrendDetailPageProps) 
 
           <article className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
+              <Globe className="h-5 w-5 text-cyan-200" />
+              Hva betyr dette i markedet?
+            </h3>
+            <p className="leading-relaxed text-zinc-300">{trend.opportunity}</p>
+            <div className="flex flex-wrap gap-2">
+              {trend.useCases.map((item) => (
+                <Badge key={item}>{item}</Badge>
+              ))}
+            </div>
+          </article>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <article className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
               <Link2 className="h-5 w-5 text-cyan-200" />
               Kilder
             </h3>
@@ -85,6 +99,9 @@ export default async function TrendDetailPage({ params }: TrendDetailPageProps) 
           </h3>
           <p className="text-zinc-300">
             Aktiv region: <span className="text-zinc-50">{trend.region}</span>
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+            Denne trenden overvakes som relevant for bade private brukere og virksomheter som vil oppdage ettersporsel, nye vaner og tidlige markedslommer.
           </p>
         </article>
       </section>
