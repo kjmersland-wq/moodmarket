@@ -46,6 +46,26 @@ npm run dev
 
 Aapne `http://localhost:3000`.
 
+## Innlogging
+
+Applikasjonen er beskyttet med privat innlogging.
+
+1. Kopier `.env.example` til `.env.local`.
+2. Sett verdier for:
+	- `AUTH_EMAIL`
+	- `AUTH_PASSWORD`
+	- `AUTH_SECRET`
+
+Ruter er beskyttet via `proxy.ts`, og brukeren sendes til `/login` uten gyldig session-cookie.
+
+## Kom i gang med miljovariabler
+
+```bash
+copy .env.example .env.local
+```
+
+Aapne `http://localhost:3000`.
+
 ## Bygg for produksjon
 
 ```bash

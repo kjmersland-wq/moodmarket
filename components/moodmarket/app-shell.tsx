@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChartLine, Compass, Globe } from "lucide-react";
+import { LogoutButton } from "@/components/moodmarket/logout-button";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -24,7 +25,8 @@ export function AppShell({ currentPath, children }: AppShellProps) {
               <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">MoodMarket</p>
               <h1 className="text-xl font-semibold text-white">Global trendintelligens</h1>
             </div>
-            <nav className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <nav className="flex flex-wrap items-center gap-2">
               {links.map(({ href, label, icon: Icon }) => {
                 const active = currentPath === href;
                 return (
@@ -43,7 +45,9 @@ export function AppShell({ currentPath, children }: AppShellProps) {
                   </Link>
                 );
               })}
-            </nav>
+              </nav>
+              <LogoutButton />
+            </div>
           </div>
         </header>
         {children}
