@@ -1,0 +1,102 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, ChartLine, Globe, Link2 } from "lucide-react";
+import { AppShell } from "@/components/moodmarket/app-shell";
+import { MiniSparkline } from "@/components/moodmarket/mini-sparkline";
+import { StrengthIndicator } from "@/components/moodmarket/strength-indicator";
+import { Badge } from "@/components/ui/badge";
+import { getTrendById } from "@/lib/trend-service";
+import { formatPercent } from "@/lib/utils";
+
+type TrendDetailPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function TrendDetailPage({ params }: TrendDetailPageProps) {
+  const { id } = await params;
+  const trend = getTrendById(id);
+
+  if (!trend) {
+    notFound();
+  }
+
+  return (
+    <AppShell currentPath="/">
+      <section className="space-y-6">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-zinc-100">
+          <ArrowLeft className="h-4 w-4" />
+          Tilbake til dashboard
+        </Link>
+
+        <div className="grid gap-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:grid-cols-[1.3fr_1fr] md:p-8">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>{trend.category}</Badge>
+              <Badge className="text-cyan-100">{trend.country}</Badge>
+            </div>
+            <h2 className="text-3xl font-semibold text-zinc-50 md:text-4xl">{trend.name}</h2>
+            <p className="text-sm text-zinc-300 md:text-base">
+              Denne trenden viser tydelig global momentum med sterke signaler pa tvers av flere kilder.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Metric label="Siste 24 timer" value={formatPercent(trend.growth24h)} />
+              <Metric label="Siste 7 dager" value={formatPercent(trend.growth7d)} />
+              <Metric label="Siste 30 dager" value={formatPercent(trend.growth30d)} />
+            </div>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-white/10 bg-black/25 p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">Trendscore</p>
+            <p className="text-5xl font-semibold text-cyan-200">{trend.trendScore}</p>
+            <MiniSparkline points={trend.sparkline} className="h-14 w-full" />
+            <StrengthIndicator value={trend.strength} />
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <article className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
+              <ChartLine className="h-5 w-5 text-cyan-200" />
+              Hvorfor vokser denne?
+            </h3>
+            <p className="leading-relaxed text-zinc-300">{trend.aiSummary}</p>
+          </article>
+
+          <article className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
+              <Link2 className="h-5 w-5 text-cyan-200" />
+              Kilder
+            </h3>
+            <ul className="space-y-2 text-sm text-zinc-300">
+              {trend.sources.map((source) => (
+                <li key={source.title} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="font-medium text-zinc-100">{source.title}</p>
+                  <p className="mt-1 text-xs text-zinc-400">{source.sourceType}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+
+        <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+          <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-zinc-100">
+            <Globe className="h-5 w-5 text-cyan-200" />
+            Region
+          </h3>
+          <p className="text-zinc-300">
+            Aktiv region: <span className="text-zinc-50">{trend.region}</span>
+          </p>
+        </article>
+      </section>
+    </AppShell>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+      <p className="text-xs text-zinc-400">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-emerald-300">{value}</p>
+    </div>
+  );
+}
