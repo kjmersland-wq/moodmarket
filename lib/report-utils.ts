@@ -12,7 +12,26 @@ export type ProductIdea = {
   description: string;
   revenueLowNok: number;
   revenueHighNok: number;
+  monthlyFixedCostNok: number;
+  setupCostNok: number;
   confidence: "Lav" | "Moderat" | "Hoy";
+};
+
+export type MonthlyProjection = {
+  month: number;
+  bestNok: number;
+  baseNok: number;
+  worstNok: number;
+};
+
+export type IdeaFinancials = {
+  monthly: MonthlyProjection[];
+  sumBestNok: number;
+  sumBaseNok: number;
+  sumWorstNok: number;
+  totalCost12mNok: number;
+  breakEvenMonth: number | null;
+  roi12mBasePercent: number;
 };
 
 export type TrendReportEntry = {
@@ -20,7 +39,10 @@ export type TrendReportEntry = {
   ideas: ProductIdea[];
 };
 
-const categoryTemplates: Record<string, Array<Omit<ProductIdea, "id" | "revenueLowNok" | "revenueHighNok" | "confidence">>> = {
+const categoryTemplates: Record<
+  string,
+  Array<Omit<ProductIdea, "id" | "revenueLowNok" | "revenueHighNok" | "monthlyFixedCostNok" | "setupCostNok" | "confidence">>
+> = {
   default: [
     {
       title: "Signalradar",
@@ -146,6 +168,10 @@ function formatToNok(value: number) {
   }).format(value);
 }
 
+function round(value: number) {
+  return Math.round(value);
+}
+
 function estimateBaseMonthlyRevenue(trend: Trend) {
   const momentum = trend.trendScore * 0.7 + trend.strength * 0.35 + trend.growth24h * 0.9 + trend.growth7d * 0.18;
   return Math.round(15000 + momentum * 420);
@@ -155,6 +181,32 @@ function confidenceFromTrend(trend: Trend): ProductIdea["confidence"] {
   if (trend.trendScore >= 88 && trend.strength >= 80) return "Hoy";
   if (trend.trendScore >= 76) return "Moderat";
   return "Lav";
+}
+
+function estimateCostProfile(format: ProductFormat, confidence: ProductIdea["confidence"]) {
+  const confidenceFactor = confidence === "Hoy" ? 1.2 : confidence === "Moderat" ? 1 : 0.82;
+
+  const baseProfile =
+    format === "App"
+      ? { setupCostNok: 320000, monthlyFixedCostNok: 58000 }
+      : format === "Webapp"
+        ? { setupCostNok: 390000, monthlyFixedCostNok: 72000 }
+        : { setupCostNok: 210000, monthlyFixedCostNok: 46000 };
+
+  return {
+    setupCostNok: round(baseProfile.setupCostNok * confidenceFactor),
+    monthlyFixedCostNok: round(baseProfile.monthlyFixedCostNok * confidenceFactor),
+  };
+}
+
+function monthlyRamp(month: number) {
+  const growth = 0.48 + month * 0.065;
+  return Math.min(1.28, growth);
+}
+
+function seasonalFactor(month: number) {
+  const seasonal = 1 + Math.sin((month / 12) * Math.PI * 2 - Math.PI / 2) * 0.06;
+  return seasonal;
 }
 
 export function getProductIdeasForTrend(trend: Trend): ProductIdea[] {
@@ -167,15 +219,57 @@ export function getProductIdeasForTrend(trend: Trend): ProductIdea[] {
     const center = Math.round(base * multipliers[index]);
     const revenueLowNok = Math.round(center * 0.65);
     const revenueHighNok = Math.round(center * 1.45);
+    const costs = estimateCostProfile(template.format, confidence);
 
     return {
       id: `${trend.id}-${index}`,
       ...template,
       revenueLowNok,
       revenueHighNok,
+      monthlyFixedCostNok: costs.monthlyFixedCostNok,
+      setupCostNok: costs.setupCostNok,
       confidence,
     };
   });
+}
+
+export function calculateIdeaFinancials(idea: ProductIdea): IdeaFinancials {
+  const center = (idea.revenueLowNok + idea.revenueHighNok) / 2;
+
+  const monthly = Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1;
+    const baseNok = round(center * monthlyRamp(month) * seasonalFactor(month));
+    const bestNok = round(baseNok * 1.34);
+    const worstNok = round(baseNok * 0.67);
+    return { month, baseNok, bestNok, worstNok };
+  });
+
+  const sumBaseNok = monthly.reduce((sum, item) => sum + item.baseNok, 0);
+  const sumBestNok = monthly.reduce((sum, item) => sum + item.bestNok, 0);
+  const sumWorstNok = monthly.reduce((sum, item) => sum + item.worstNok, 0);
+  const totalCost12mNok = idea.setupCostNok + idea.monthlyFixedCostNok * 12;
+
+  let cumulative = -idea.setupCostNok;
+  let breakEvenMonth: number | null = null;
+
+  for (const item of monthly) {
+    cumulative += item.baseNok - idea.monthlyFixedCostNok;
+    if (cumulative >= 0 && breakEvenMonth === null) {
+      breakEvenMonth = item.month;
+    }
+  }
+
+  const roi12mBasePercent = round(((sumBaseNok - totalCost12mNok) / totalCost12mNok) * 100);
+
+  return {
+    monthly,
+    sumBaseNok,
+    sumBestNok,
+    sumWorstNok,
+    totalCost12mNok,
+    breakEvenMonth,
+    roi12mBasePercent,
+  };
 }
 
 export function buildTrendReport(trends: Trend[]): TrendReportEntry[] {
@@ -218,10 +312,10 @@ export function generateTrendReportPdf(entries: TrendReportEntry[]) {
   y += 34;
 
   entries.forEach((entry, index) => {
-    ensureSpace(210);
+    ensureSpace(250);
     doc.setDrawColor(50, 70, 95);
     doc.setFillColor(18, 28, 46);
-    doc.roundedRect(margin, y, contentWidth, 150, 12, 12, "FD");
+    doc.roundedRect(margin, y, contentWidth, 210, 12, 12, "FD");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(240, 248, 255);
@@ -239,14 +333,29 @@ export function generateTrendReportPdf(entries: TrendReportEntry[]) {
     let localY = y + 122;
     entry.ideas.forEach((idea) => {
       const revenue = `${formatToNok(idea.revenueLowNok)} - ${formatToNok(idea.revenueHighNok)} / maned`;
+      const financials = calculateIdeaFinancials(idea);
       doc.setTextColor(240, 248, 255);
       doc.text(`${idea.format}: ${idea.title}`, margin + 18, localY);
       doc.setTextColor(120, 220, 170);
       doc.text(revenue, margin + 220, localY);
+
+      localY += 13;
+      doc.setTextColor(182, 202, 224);
+      doc.text(
+        `12m base: ${formatToNok(financials.sumBaseNok)} | best: ${formatToNok(financials.sumBestNok)} | worst: ${formatToNok(financials.sumWorstNok)}`,
+        margin + 18,
+        localY
+      );
+      localY += 12;
+      doc.text(
+        `Kostnader 12m: ${formatToNok(financials.totalCost12mNok)} | Break-even: ${financials.breakEvenMonth ? `Mnd ${financials.breakEvenMonth}` : "Etter 12m"} | ROI(base): ${financials.roi12mBasePercent}%`,
+        margin + 18,
+        localY
+      );
       localY += 14;
     });
 
-    y += 168;
+    y += 228;
   });
 
   doc.save("moodmarket-trendrapport.pdf");
@@ -254,4 +363,8 @@ export function generateTrendReportPdf(entries: TrendReportEntry[]) {
 
 export function formatRevenueRange(low: number, high: number) {
   return `${formatToNok(low)} - ${formatToNok(high)} / maned`;
+}
+
+export function formatNok(value: number) {
+  return formatToNok(value);
 }

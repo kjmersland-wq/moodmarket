@@ -5,6 +5,8 @@ import { FileDown, Sparkles } from "lucide-react";
 import { trends } from "@/lib/mock-data";
 import {
   buildTrendReport,
+  calculateIdeaFinancials,
+  formatNok,
   formatRevenueRange,
   generateTrendReportPdf,
 } from "@/lib/report-utils";
@@ -109,12 +111,67 @@ export function ReportBuilder() {
                         <Badge>{idea.format}</Badge>
                       </div>
                       <p className="mt-2 text-sm text-zinc-300">{idea.description}</p>
+                      {(() => {
+                        const financials = calculateIdeaFinancials(idea);
+                        return (
+                          <>
                       <div className="mt-3 grid gap-2 text-sm text-zinc-400 md:grid-cols-2">
                         <p>Maalgruppe: <span className="text-zinc-200">{idea.targetAudience}</span></p>
                         <p>Prismodell: <span className="text-zinc-200">{idea.pricingModel}</span></p>
                         <p>Estimert inntjening: <span className="text-emerald-300">{formatRevenueRange(idea.revenueLowNok, idea.revenueHighNok)}</span></p>
                         <p>Sikkerhet: <span className="text-zinc-200">{idea.confidence}</span></p>
                       </div>
+
+                      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">12-maneders prognose</p>
+                        <div className="mt-2 overflow-x-auto">
+                          <table className="w-full min-w-[520px] text-left text-xs text-zinc-300">
+                            <thead className="text-zinc-400">
+                              <tr>
+                                {Array.from({ length: 12 }, (_, i) => (
+                                  <th key={i} className="pr-3 pb-2 font-medium">M{i + 1}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                {financials.monthly.map((month) => (
+                                  <td key={`base-${month.month}`} className="pr-3 pb-1 text-emerald-300">
+                                    {Math.round(month.baseNok / 1000)}k
+                                  </td>
+                                ))}
+                              </tr>
+                              <tr>
+                                {financials.monthly.map((month) => (
+                                  <td key={`best-${month.month}`} className="pr-3 pb-1 text-cyan-200">
+                                    {Math.round(month.bestNok / 1000)}k
+                                  </td>
+                                ))}
+                              </tr>
+                              <tr>
+                                {financials.monthly.map((month) => (
+                                  <td key={`worst-${month.month}`} className="pr-3 text-rose-300">
+                                    {Math.round(month.worstNok / 1000)}k
+                                  </td>
+                                ))}
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <p className="mt-2 text-xs text-zinc-500">Rad 1: base, rad 2: best, rad 3: worst.</p>
+                      </div>
+
+                      <div className="mt-3 grid gap-2 text-sm text-zinc-400 md:grid-cols-2">
+                        <p>12m base inntjening: <span className="text-emerald-300">{formatNok(financials.sumBaseNok)}</span></p>
+                        <p>12m best inntjening: <span className="text-cyan-200">{formatNok(financials.sumBestNok)}</span></p>
+                        <p>12m worst inntjening: <span className="text-rose-300">{formatNok(financials.sumWorstNok)}</span></p>
+                        <p>12m kostnader: <span className="text-zinc-200">{formatNok(financials.totalCost12mNok)}</span></p>
+                        <p>Break-even: <span className="text-zinc-200">{financials.breakEvenMonth ? `Mnd ${financials.breakEvenMonth}` : "Etter 12 maneder"}</span></p>
+                        <p>ROI (base, 12m): <span className="text-zinc-200">{financials.roi12mBasePercent}%</span></p>
+                      </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   ))}
                 </div>
