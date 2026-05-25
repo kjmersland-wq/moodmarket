@@ -1,9 +1,15 @@
 export const AUTH_COOKIE_NAME = "moodmarket_session";
+export const AUTH_PENDING_COOKIE_NAME = "moodmarket_pending";
 
-export type AuthConfig = {
+type SessionPayload = {
   email: string;
-  password: string;
-  secret: string;
+  exp: number;
+};
+
+type PendingPayload = {
+  email: string;
+  codeHash: string;
+  exp: number;
 };
 
 function toHex(buffer: ArrayBuffer) {
@@ -12,41 +18,132 @@ function toHex(buffer: ArrayBuffer) {
     .join("");
 }
 
+function bytesToBase64Url(bytes: Uint8Array) {
+  let binary = "";
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlToBytes(base64Url: string) {
+  const normalized = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
 async function sha256(input: string) {
   const encoded = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest("SHA-256", encoded);
   return toHex(digest);
 }
 
-export function getAuthConfig(): AuthConfig | null {
-  const email = process.env.AUTH_EMAIL;
-  const password = process.env.AUTH_PASSWORD;
-  const secret = process.env.AUTH_SECRET;
-
-  if (!email || !password || !secret) {
-    return null;
-  }
-
-  return { email, password, secret };
+function toBase64Url(value: string) {
+  return bytesToBase64Url(new TextEncoder().encode(value));
 }
 
-export async function createSessionToken(config: AuthConfig) {
-  return sha256(`${config.email}:${config.password}:${config.secret}`);
+function fromBase64Url(value: string) {
+  return new TextDecoder().decode(base64UrlToBytes(value));
+}
+
+function getAuthSecret() {
+  return process.env.AUTH_SECRET || null;
+}
+
+async function signData(payloadBase64: string, secret: string) {
+  return sha256(`${payloadBase64}.${secret}`);
+}
+
+async function createSignedToken(payload: object) {
+  const secret = getAuthSecret();
+  if (!secret) return null;
+
+  const payloadBase64 = toBase64Url(JSON.stringify(payload));
+  const signature = await signData(payloadBase64, secret);
+
+  return `${payloadBase64}.${signature}`;
+}
+
+async function parseSignedToken<T>(token?: string | null): Promise<T | null> {
+  if (!token) return null;
+
+  const secret = getAuthSecret();
+  if (!secret) return null;
+
+  const [payloadBase64, signature] = token.split(".");
+  if (!payloadBase64 || !signature) return null;
+
+  const expectedSignature = await signData(payloadBase64, secret);
+  if (expectedSignature !== signature) return null;
+
+  try {
+    return JSON.parse(fromBase64Url(payloadBase64)) as T;
+  } catch {
+    return null;
+  }
+}
+
+export function createVerificationCode() {
+  const code = Math.floor(100000 + Math.random() * 900000);
+  return String(code);
+}
+
+export async function createPendingToken(email: string, code: string) {
+  const payload: PendingPayload = {
+    email,
+    codeHash: await sha256(code),
+    exp: Date.now() + 1000 * 60 * 10,
+  };
+
+  return createSignedToken(payload);
+}
+
+export async function verifyPendingToken(token: string | undefined, email: string, code: string) {
+  const payload = await parseSignedToken<PendingPayload>(token);
+  if (!payload) return false;
+
+  const codeHash = await sha256(code);
+  return payload.exp > Date.now() && payload.email === email && payload.codeHash === codeHash;
+}
+
+export async function createSessionToken(email: string) {
+  const payload: SessionPayload = {
+    email,
+    exp: Date.now() + 1000 * 60 * 60 * 24 * 30,
+  };
+
+  return createSignedToken(payload);
 }
 
 export async function validateSessionToken(token?: string | null) {
-  if (!token) return false;
+  const payload = await parseSignedToken<SessionPayload>(token);
+  if (!payload) return false;
 
-  const config = getAuthConfig();
-  if (!config) return false;
+  if (payload.exp <= Date.now()) return false;
 
-  const expected = await createSessionToken(config);
-  return token === expected;
+  return true;
 }
 
-export function validateCredentials(email: string, password: string) {
-  const config = getAuthConfig();
-  if (!config) return false;
+export function validateEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-  return email === config.email && password === config.password;
+export function hasAuthSecret() {
+  return Boolean(getAuthSecret());
+}
+
+export function getSessionDuration() {
+  return 60 * 60 * 24 * 30;
+}
+
+export function getPendingDuration() {
+  return 60 * 10;
 }

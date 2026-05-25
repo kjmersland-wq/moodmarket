@@ -48,13 +48,22 @@ Aapne `http://localhost:3000`.
 
 ## Innlogging
 
-Applikasjonen er beskyttet med privat innlogging.
+Applikasjonen er beskyttet med registrering og epostverifisering.
 
 1. Kopier `.env.example` til `.env.local`.
 2. Sett verdier for:
-	- `AUTH_EMAIL`
-	- `AUTH_PASSWORD`
 	- `AUTH_SECRET`
+	- `SMTP_HOST`
+	- `SMTP_PORT`
+	- `SMTP_USER`
+	- `SMTP_PASS`
+	- `SMTP_FROM`
+
+Flyt:
+
+1. Gaa til `/login`.
+2. Skriv epost og velg "Send kode".
+3. Bekreft koden fra Gmail for a fullfore registrering/innlogging.
 
 Ruter er beskyttet via `proxy.ts`, og brukeren sendes til `/login` uten gyldig session-cookie.
 

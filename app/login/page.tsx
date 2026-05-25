@@ -10,25 +10,66 @@ import { Input } from "@/components/ui/input";
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!codeSent) {
+      await sendCode();
+      return;
+    }
+
+    await verifyCode();
+  }
+
+  async function sendCode() {
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       });
 
+      const data = (await response.json()) as { message?: string };
+
       if (!response.ok) {
-        const data = (await response.json()) as { message?: string };
-        setError(data.message ?? "Kunne ikke logge inn");
+        setError(data.message ?? "Kunne ikke sende kode");
+        return;
+      }
+
+      setCodeSent(true);
+      setSuccess("Kode sendt til epost. Sjekk innboksen din.");
+    } catch {
+      setError("Noe gikk galt. Prov igjen.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function verifyCode() {
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/email/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        setError(data.message ?? "Kunne ikke verifisere kode");
         return;
       }
 
@@ -57,7 +98,7 @@ export default function LoginPage() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">MoodMarket</p>
-            <h1 className="text-2xl font-semibold text-zinc-50">Privat innlogging</h1>
+            <h1 className="text-2xl font-semibold text-zinc-50">Registrer deg med Gmail</h1>
           </div>
         </div>
 
@@ -74,29 +115,43 @@ export default function LoginPage() {
               placeholder="deg@epost.no"
               autoComplete="email"
               required
+              disabled={loading || codeSent}
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm text-zinc-300" htmlFor="password">
-              Passord
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Skriv passord"
-              autoComplete="current-password"
-              required
-            />
-          </div>
+          {codeSent ? (
+            <div className="space-y-1">
+              <label className="text-sm text-zinc-300" htmlFor="code">
+                Verifiseringskode
+              </label>
+              <Input
+                id="code"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                placeholder="6-sifret kode"
+                inputMode="numeric"
+                required
+              />
+            </div>
+          ) : null}
 
           {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+          {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logger inn..." : "Logg inn"}
+            {loading ? "Behandler..." : codeSent ? "Bekreft og ga videre" : "Send kode"}
           </Button>
+
+          {codeSent ? (
+            <button
+              type="button"
+              onClick={sendCode}
+              className="w-full text-sm text-cyan-200 hover:text-cyan-100"
+              disabled={loading}
+            >
+              Send ny kode
+            </button>
+          ) : null}
         </form>
       </motion.section>
     </main>
