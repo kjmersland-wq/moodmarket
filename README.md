@@ -53,6 +53,7 @@ Applikasjonen er beskyttet med registrering og epostverifisering.
 1. Kopier `.env.example` til `.env.local`.
 2. Sett verdier for:
 	- `AUTH_SECRET`
+	- `ALLOWED_EMAIL`
 	- `SMTP_HOST`
 	- `SMTP_PORT`
 	- `SMTP_USER`
@@ -64,6 +65,8 @@ Flyt:
 1. Gaa til `/login`.
 2. Skriv epost og velg "Send kode".
 3. Bekreft koden fra Gmail for a fullfore registrering/innlogging.
+
+Hvis `ALLOWED_EMAIL` er satt, er kun den eposten tillatt.
 
 Ruter er beskyttet via `proxy.ts`, og brukeren sendes til `/login` uten gyldig session-cookie.
 

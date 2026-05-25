@@ -4,6 +4,7 @@ import {
   AUTH_PENDING_COOKIE_NAME,
   createSessionToken,
   getSessionDuration,
+  isEmailAllowed,
   verifyPendingToken,
 } from "@/lib/auth";
 
@@ -21,6 +22,10 @@ export async function POST(request: Request) {
 
   if (!email || !code) {
     return NextResponse.json({ message: "Epost og kode er pakrevd" }, { status: 400 });
+  }
+
+  if (!isEmailAllowed(email)) {
+    return NextResponse.json({ message: "Denne eposten har ikke tilgang" }, { status: 403 });
   }
 
   const cookieHeader = request.headers.get("cookie") ?? "";

@@ -5,6 +5,7 @@ import {
   createVerificationCode,
   getPendingDuration,
   hasAuthSecret,
+  isEmailAllowed,
   validateEmail,
 } from "@/lib/auth";
 import { hasMailConfig, sendVerificationEmail } from "@/lib/mailer";
@@ -39,6 +40,10 @@ export async function POST(request: Request) {
 
   if (!validateEmail(email)) {
     return NextResponse.json({ message: "Ugyldig epostadresse" }, { status: 400 });
+  }
+
+  if (!isEmailAllowed(email)) {
+    return NextResponse.json({ message: "Denne eposten har ikke tilgang" }, { status: 403 });
   }
 
   const code = createVerificationCode();

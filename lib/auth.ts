@@ -136,6 +136,13 @@ export function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+export function isEmailAllowed(email: string) {
+  const allowed = process.env.ALLOWED_EMAIL?.trim().toLowerCase();
+  if (!allowed) return true;
+
+  return email.trim().toLowerCase() === allowed;
+}
+
 export function hasAuthSecret() {
   return Boolean(getAuthSecret());
 }
