@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChartLine, Compass, Globe } from "lucide-react";
+import { ChartLine, Compass, Globe, LifeBuoy, FileText } from "lucide-react";
 import { LogoutButton } from "@/components/moodmarket/logout-button";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,8 @@ const links = [
   { href: "/", label: "Dashboard", icon: ChartLine },
   { href: "/utforsk", label: "Utforsk", icon: Compass },
   { href: "/verdenskart", label: "Verdenskart", icon: Globe },
+  { href: "/funksjoner", label: "Funksjoner", icon: LifeBuoy },
+  { href: "/rapporter", label: "Rapporter", icon: FileText },
 ];
 
 type AppShellProps = {

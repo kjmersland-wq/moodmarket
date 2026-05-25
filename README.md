@@ -14,6 +14,8 @@ MoodMarket er en moderne SaaS-inspirert webapp for tidlig oppdagelse av globale 
 - Trenddetaljer med vekst for 24t, 7d og 30d, kilder og AI-oppsummering
 - Utforsk-side med sok og filtre for region og kategori
 - Interaktivt verdenskart med klikkbare land og varmeindikator
+- Funksjonsside med brukshjelp for full utnyttelse av plattformen
+- Rapportside med PDF-eksport av trendforslag, produktmuligheter og inntektsintervaller
 - Global mockdata (ikke begrenset til Norge)
 
 ## Viktig om data
