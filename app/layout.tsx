@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import type { CSSProperties } from "react";
 import "./globals.css";
-
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "MoodMarket",
@@ -23,7 +13,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="no" className={`${manrope.variable} ${spaceGrotesk.variable} h-full antialiased`}>
+    <html
+      lang="no"
+      className="h-full antialiased"
+      style={
+        {
+          "--font-manrope":
+            "Inter, Avenir, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Liberation Sans, sans-serif",
+          "--font-space-grotesk":
+            "Inter, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Liberation Sans, sans-serif",
+        } as CSSProperties
+      }
+    >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
