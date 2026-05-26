@@ -9,7 +9,7 @@ export default function RapporterPage() {
           <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">Rapporter</p>
           <h2 className="text-3xl font-semibold text-zinc-50 md:text-4xl">Bygg profesjonelle trendrapporter</h2>
           <p className="max-w-3xl text-sm text-zinc-300 md:text-base">
-            Velg trendspor og generer en PDF med produktmuligheter, realistiske inntektsintervaller og forslag til apper, nettsider og webapper du kan bygge rundt signalene.
+            Velg trendspor og generer en PDF med konkrete app- og webforslag, verdiforslag, betalingsmodell, lanseringsfart og lønnsomhetsprioritering.
           </p>
         </header>
         <ReportBuilder />

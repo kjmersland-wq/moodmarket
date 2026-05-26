@@ -6,6 +6,7 @@ import { trends } from "@/lib/mock-data";
 import {
   buildTrendReport,
   calculateIdeaFinancials,
+  calculateIdeaProfitability,
   formatNok,
   formatRevenueRange,
   generateTrendReportPdf,
@@ -113,13 +114,30 @@ export function ReportBuilder() {
                       <p className="mt-2 text-sm text-zinc-300">{idea.description}</p>
                       {(() => {
                         const financials = calculateIdeaFinancials(idea);
-                        return (
-                          <>
+                       const profitability = calculateIdeaProfitability(idea, entry.trend);
+                       return (
+                         <>
                       <div className="mt-3 grid gap-2 text-sm text-zinc-400 md:grid-cols-2">
-                        <p>Maalgruppe: <span className="text-zinc-200">{idea.targetAudience}</span></p>
-                        <p>Prismodell: <span className="text-zinc-200">{idea.pricingModel}</span></p>
-                        <p>Estimert inntjening: <span className="text-emerald-300">{formatRevenueRange(idea.revenueLowNok, idea.revenueHighNok)}</span></p>
-                        <p>Sikkerhet: <span className="text-zinc-200">{idea.confidence}</span></p>
+                       <p>Konsept: <span className="text-zinc-200">{idea.description}</span></p>
+                       <p>Maalgruppe: <span className="text-zinc-200">{idea.targetAudience}</span></p>
+                       <p>Verdiforslag: <span className="text-zinc-200">{idea.valueProposition}</span></p>
+                       <p>Prismodell: <span className="text-zinc-200">{idea.pricingModel}</span></p>
+                       <p>Lansering: <span className="text-zinc-200">{idea.launchTimeline}</span></p>
+                       <p>Estimert inntjening: <span className="text-emerald-300">{formatRevenueRange(idea.revenueLowNok, idea.revenueHighNok)}</span></p>
+                       <p>Sikkerhet: <span className="text-zinc-200">{idea.confidence}</span></p>
+                       <p>Prioriteringsscore: <span className="text-cyan-200">{profitability.priorityScore}/100</span></p>
+                      </div>
+
+                      <div className="mt-4 rounded-xl border border-cyan-300/20 bg-cyan-500/5 p-3">
+                       <p className="text-xs uppercase tracking-[0.18em] text-cyan-200/80">Lonnsomhetsoversikt</p>
+                       <div className="mt-2 grid gap-2 text-sm text-zinc-300 md:grid-cols-2">
+                         <p>Inntektspotensial: <span className="text-zinc-100">{profitability.incomePotential}</span></p>
+                         <p>Kostnadsniva: <span className="text-zinc-100">{profitability.costLevel}</span></p>
+                         <p>Forventet break-even: <span className="text-zinc-100">{profitability.breakEvenEstimate}</span></p>
+                         <p>Markedsstorrelse: <span className="text-zinc-100">{profitability.marketSize}</span></p>
+                         <p>Konkurranseniva: <span className="text-zinc-100">{profitability.competitionLevel}</span></p>
+                         <p>Samlet prioritet: <span className="text-cyan-200">{profitability.priorityScore}/100</span></p>
+                       </div>
                       </div>
 
                       <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
