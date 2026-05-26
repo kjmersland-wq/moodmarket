@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,7 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, password })
       });
 
       const payload = (await response.json()) as { error?: string };
@@ -43,7 +44,7 @@ export default function LoginPage() {
       <section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
         <p className="text-xs uppercase tracking-[0.22em] text-cyan-200/80">MoodMarket</p>
         <h1 className="mt-2 text-2xl font-semibold text-white">Logg inn</h1>
-        <p className="mt-2 text-sm text-slate-300">Bruk registrert epost for tilgang.</p>
+        <p className="mt-2 text-sm text-slate-300">Bruk epost og passord for tilgang.</p>
 
         <form className="mt-5 space-y-3" onSubmit={onSubmit}>
           <Input
@@ -52,6 +53,14 @@ export default function LoginPage() {
             placeholder="epost@domene.no"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+          />
+          <Input
+            required
+            type="password"
+            placeholder="Passord"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
           />
           <button
             type="submit"

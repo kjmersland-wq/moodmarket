@@ -12,7 +12,15 @@ type AccessOptions = {
 async function resolveSessionUser(email: string) {
   const normalized = email.trim().toLowerCase();
   const admin = isAdminEmail(normalized);
-  const account = await findAccountByEmail(normalized);
+  let account = null;
+
+  try {
+    account = await findAccountByEmail(normalized);
+  } catch (error) {
+    if (!admin) {
+      throw error;
+    }
+  }
 
   if (account && !account.aktiv) {
     return null;

@@ -8,6 +8,10 @@ export type Account = {
   opprettet: string;
 };
 
+export type AccountAuth = Account & {
+  passord_hash: string | null;
+};
+
 let accountSchemaReady = false;
 
 async function ensureAccountSchema() {
@@ -22,9 +26,15 @@ async function ensureAccountSchema() {
       id bigserial primary key,
       email text not null unique,
       navn text,
+      passord_hash text,
       aktiv boolean not null default true,
       opprettet timestamptz not null default now()
     );
+  `);
+
+  await pool.query(`
+    alter table app_accounts
+    add column if not exists passord_hash text;
   `);
 
   accountSchemaReady = true;
@@ -66,6 +76,22 @@ export async function findAccountByEmail(email: string): Promise<Account | null>
   return result.rows[0] ?? null;
 }
 
+export async function findAccountAuthByEmail(email: string): Promise<AccountAuth | null> {
+  await ensureAccountSchema();
+  const pool = getDbPool();
+  const result = await pool.query<AccountAuth>(
+    `
+      select id, email, navn, passord_hash, aktiv, opprettet
+      from app_accounts
+      where email = $1
+      limit 1;
+    `,
+    [email.trim().toLowerCase()]
+  );
+
+  return result.rows[0] ?? null;
+}
+
 export async function upsertAccount(input: { email: string; navn?: string | null }) {
   await ensureAccountSchema();
   const pool = getDbPool();
@@ -96,6 +122,22 @@ export async function setAccountStatus(id: number, aktiv: boolean) {
       returning id, email, navn, aktiv, opprettet;
     `,
     [id, aktiv]
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function setAccountPasswordHash(email: string, passwordHash: string) {
+  await ensureAccountSchema();
+  const pool = getDbPool();
+  const result = await pool.query<Account>(
+    `
+      update app_accounts
+      set passord_hash = $2
+      where email = $1
+      returning id, email, navn, aktiv, opprettet;
+    `,
+    [email.trim().toLowerCase(), passwordHash]
   );
 
   return result.rows[0] ?? null;
