@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { countryHeat, trends } from "@/lib/mock-data";
 import { RegionFilter } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+
+const GEO_URL = "/world-110m.json";
 
 const regionOptions: RegionFilter[] = [
   "Hele verden",
@@ -16,63 +19,106 @@ const regionOptions: RegionFilter[] = [
   "Oseania",
 ];
 
-const continentPaths = [
-  "M83 126 L155 84 L223 96 L249 145 L213 184 L164 173 L122 197 L91 176 Z",
-  "M240 236 L285 250 L298 299 L278 371 L247 413 L216 370 L224 296 Z",
-  "M429 96 L500 83 L555 107 L585 143 L553 171 L490 164 L444 143 Z",
-  "M483 178 L550 173 L595 200 L587 245 L540 264 L502 235 L470 205 Z",
-  "M510 274 L555 283 L589 342 L565 409 L523 434 L486 388 L473 332 Z",
-  "M657 124 L748 114 L840 149 L865 204 L832 253 L745 247 L679 220 L639 172 Z",
-  "M734 286 L804 303 L845 349 L835 396 L784 413 L726 388 L701 336 Z",
-];
+/** ISO alpha-2 → numeric string used in world-atlas topojson */
+const alpha2ToNumeric: Record<string, string> = {
+  US: "840",
+  CA: "124",
+  BR: "076",
+  GB: "826",
+  SE: "752",
+  DE: "276",
+  NL: "528",
+  ES: "724",
+  IT: "380",
+  PT: "620",
+  IS: "352",
+  KE: "404",
+  JP: "392",
+  ID: "360",
+  AU: "036",
+};
+
+/** Region zoom/center presets */
+const regionView: Record<RegionFilter, { center: [number, number]; zoom: number }> = {
+  "Hele verden":   { center: [10, 10],   zoom: 1 },
+  "Nord-Amerika":  { center: [-100, 40], zoom: 2.8 },
+  "Sor-Amerika":   { center: [-60, -15], zoom: 2.8 },
+  Europa:          { center: [15, 52],   zoom: 4.5 },
+  Asia:            { center: [100, 30],  zoom: 2.6 },
+  Afrika:          { center: [20, 5],    zoom: 2.8 },
+  Oseania:         { center: [140, -25], zoom: 3.2 },
+};
+
+function heatToColor(heat: number, selected: boolean): string {
+  if (selected) return "rgba(34,211,238,0.85)";
+  if (heat >= 85) return "rgba(34,211,238,0.55)";
+  if (heat >= 70) return "rgba(34,211,238,0.38)";
+  if (heat >= 55) return "rgba(34,211,238,0.22)";
+  return "rgba(34,211,238,0.10)";
+}
+
+function heatToStroke(selected: boolean): string {
+  return selected ? "rgba(34,211,238,0.9)" : "rgba(255,255,255,0.12)";
+}
 
 export function WorldMap() {
   const [selectedRegion, setSelectedRegion] = useState<RegionFilter>("Hele verden");
   const [selectedCodes, setSelectedCodes] = useState<string[]>([countryHeat[0]?.code ?? ""]);
+  const [tooltip, setTooltip] = useState<{ name: string; heat: number } | null>(null);
+
+  const numericToCountry = useMemo(() => {
+    const map = new Map<string, (typeof countryHeat)[number]>();
+    for (const c of countryHeat) {
+      const num = alpha2ToNumeric[c.code];
+      if (num) map.set(num, c);
+    }
+    return map;
+  }, []);
 
   const visibleCountries = useMemo(
     () =>
       selectedRegion === "Hele verden"
         ? countryHeat
-        : countryHeat.filter((country) => country.region === selectedRegion),
+        : countryHeat.filter((c) => c.region === selectedRegion),
     [selectedRegion]
   );
 
   const effectiveSelectedCodes = useMemo(() => {
-    const visibleCodes = new Set(visibleCountries.map((country) => country.code));
+    const visibleCodes = new Set(visibleCountries.map((c) => c.code));
     const kept = selectedCodes.filter((code) => visibleCodes.has(code));
-
     if (kept.length > 0) return kept;
     return visibleCountries[0] ? [visibleCountries[0].code] : [];
   }, [selectedCodes, visibleCountries]);
 
   const selectedCountries = useMemo(
-    () => visibleCountries.filter((country) => effectiveSelectedCodes.includes(country.code)),
+    () => visibleCountries.filter((c) => effectiveSelectedCodes.includes(c.code)),
     [effectiveSelectedCodes, visibleCountries]
   );
 
   const aggregatedTrends = useMemo(() => {
-    const byName = new Map(trends.map((trend) => [trend.name, trend]));
+    const byName = new Map(trends.map((t) => [t.name, t]));
     return selectedCountries
-      .flatMap((country) => country.featuredTrends.map((trendName) => byName.get(trendName)))
-      .filter((trend): trend is (typeof trends)[number] => Boolean(trend))
-      .sort((left, right) => right.trendScore - left.trendScore);
+      .flatMap((c) => c.featuredTrends.map((name) => byName.get(name)))
+      .filter((t): t is (typeof trends)[number] => Boolean(t))
+      .sort((a, b) => b.trendScore - a.trendScore);
   }, [selectedCountries]);
 
   function toggleCountry(code: string) {
-    setSelectedCodes((current) => {
-      if (current.includes(code)) {
-        if (current.length === 1) return current;
-        return current.filter((value) => value !== code);
+    setSelectedCodes((cur) => {
+      if (cur.includes(code)) {
+        if (cur.length === 1) return cur;
+        return cur.filter((v) => v !== code);
       }
-
-      return [...current, code];
+      return [...cur, code];
     });
   }
+
+  const { center, zoom } = regionView[selectedRegion];
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
       <div className="space-y-4">
+        {/* Region tabs */}
         <div className="flex flex-wrap gap-2">
           {regionOptions.map((region) => (
             <button
@@ -90,32 +136,86 @@ export function WorldMap() {
           ))}
         </div>
 
-        <div className="relative min-h-[380px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-950/40 via-zinc-900 to-indigo-950/30 p-4">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.18),transparent_40%),radial-gradient(circle_at_70%_60%,rgba(14,116,144,0.18),transparent_45%)]" />
-        <div className="relative h-full w-full rounded-xl border border-white/10 bg-black/20">
-          <svg viewBox="0 0 1000 500" className="absolute inset-0 h-full w-full opacity-95" aria-hidden>
-            <defs>
-              <linearGradient id="map-fill" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="rgba(34,211,238,0.14)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0.04)" />
-              </linearGradient>
-            </defs>
-            {continentPaths.map((path) => (
-              <path
-                key={path}
-                d={path}
-                fill="url(#map-fill)"
-                stroke="rgba(255,255,255,0.12)"
-                strokeWidth="2"
-                strokeLinejoin="round"
+        {/* Map canvas */}
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-950/40 via-zinc-900 to-indigo-950/30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.12),transparent_40%),radial-gradient(circle_at_70%_60%,rgba(14,116,144,0.12),transparent_45%)] pointer-events-none" />
+
+          {/* Tooltip */}
+          {tooltip && (
+            <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-lg border border-white/15 bg-zinc-900/90 px-3 py-1.5 text-xs text-zinc-100 shadow-lg">
+              {tooltip.name}
+              {tooltip.heat > 0 && (
+                <span className="ml-2 text-cyan-300">Heat {tooltip.heat}</span>
+              )}
+            </div>
+          )}
+
+          <ComposableMap
+            projectionConfig={{ rotate: [-10, 0, 0], scale: 147 }}
+            className="h-[380px] w-full"
+          >
+            <ZoomableGroup
+              center={center}
+              zoom={zoom}
+              maxZoom={8}
+              minZoom={1}
+            >
+              <Geographies geography={GEO_URL}>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {({ geographies }: { geographies: any[] }) =>
+                  geographies.map((geo) => {
+                    const countryData = numericToCountry.get(String(geo.id));
+                    const isActive =
+                      countryData !== undefined &&
+                      effectiveSelectedCodes.includes(countryData.code) &&
+                      visibleCountries.some((c) => c.code === countryData.code);
+                    const heat = countryData?.heat ?? 0;
+                    const fill = heat > 0 ? heatToColor(heat, isActive) : "rgba(255,255,255,0.04)";
+                    const stroke = heat > 0 ? heatToStroke(isActive) : "rgba(255,255,255,0.08)";
+
+                    return (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        fill={fill}
+                        stroke={stroke}
+                        strokeWidth={0.5}
+                        style={{
+                          default: { outline: "none", cursor: heat > 0 ? "pointer" : "default" },
+                          hover:   { outline: "none", fill: heat > 0 ? "rgba(34,211,238,0.55)" : "rgba(255,255,255,0.07)", cursor: heat > 0 ? "pointer" : "default" },
+                          pressed: { outline: "none" },
+                        }}
+                        onMouseEnter={() => {
+                          if (countryData) setTooltip({ name: countryData.country, heat: countryData.heat });
+                        }}
+                        onMouseLeave={() => setTooltip(null)}
+                        onClick={() => {
+                          if (countryData) toggleCountry(countryData.code);
+                        }}
+                      />
+                    );
+                  })
+                }
+              </Geographies>
+            </ZoomableGroup>
+          </ComposableMap>
+
+          {/* Heat legend */}
+          <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[10px] text-zinc-400">
+            <span>Lav</span>
+            {[0.10, 0.22, 0.38, 0.55, 0.85].map((a) => (
+              <span
+                key={a}
+                className="h-3 w-4 rounded-sm"
+                style={{ background: `rgba(34,211,238,${a})` }}
               />
             ))}
-          </svg>
-
-          <div className="absolute left-6 top-4 text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-            Velg ett eller flere land
+            <span>Høy</span>
           </div>
+        </div>
 
+        {/* Country chip bar */}
+        <div className="flex flex-wrap gap-2">
           {visibleCountries.map((country) => {
             const active = effectiveSelectedCodes.includes(country.code);
             return (
@@ -123,48 +223,20 @@ export function WorldMap() {
                 key={country.code}
                 type="button"
                 onClick={() => toggleCountry(country.code)}
-                className="group absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${country.x}%`, top: `${country.y}%` }}
-                aria-label={`Velg ${country.country}`}
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                  active
+                    ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
+                    : "border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:text-zinc-100"
+                }`}
               >
-                <span
-                  className={`block rounded-full border transition-all ${
-                    active
-                      ? "border-cyan-100/80 bg-cyan-300/70 shadow-[0_0_0_10px_rgba(34,211,238,0.18)]"
-                      : "border-cyan-200/30 bg-cyan-300/20"
-                  }`}
-                  style={{ width: `${8 + country.heat / 6}px`, height: `${8 + country.heat / 6}px` }}
-                />
-                <span className="pointer-events-none absolute left-1/2 top-[135%] hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-white/15 bg-zinc-900/90 px-2 py-1 text-[10px] text-zinc-200 group-hover:block">
-                  {country.country}
-                </span>
+                {country.country}
               </button>
             );
           })}
         </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {visibleCountries.map((country) => {
-              const active = effectiveSelectedCodes.includes(country.code);
-              return (
-                <button
-                  key={country.code}
-                  type="button"
-                  onClick={() => toggleCountry(country.code)}
-                  className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                    active
-                      ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
-                      : "border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:text-zinc-100"
-                  }`}
-                >
-                  {country.country}
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </div>
 
+      {/* Sidebar */}
       <motion.aside
         key={`${selectedRegion}-${effectiveSelectedCodes.join("-")}`}
         initial={{ opacity: 0, y: 8 }}
@@ -178,14 +250,14 @@ export function WorldMap() {
             : `${selectedCountries.length} land i ${selectedRegion}`}
         </h3>
         <div className="flex flex-wrap gap-2">
-          {selectedCountries.map((country) => (
-            <Badge key={country.code}>{country.country}</Badge>
+          {selectedCountries.map((c) => (
+            <Badge key={c.code}>{c.country}</Badge>
           ))}
         </div>
         <p className="text-sm leading-relaxed text-zinc-300">
           {selectedCountries.length === 1
             ? selectedCountries[0]?.description
-            : "Sammenlign flere markeder samtidig for a se hvilke signaler som vokser pa tvers av land og kontinenter."}
+            : "Sammenlign flere markeder samtidig for å se hvilke signaler som vokser på tvers av land og kontinenter."}
         </p>
         <div>
           <p className="text-sm text-zinc-300">Voksende trender</p>
@@ -216,3 +288,5 @@ export function WorldMap() {
     </div>
   );
 }
+
+
