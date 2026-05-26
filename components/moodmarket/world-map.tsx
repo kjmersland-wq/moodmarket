@@ -1,13 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { motion } from "framer-motion";
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { feature } from "topojson-client";
 import { countryHeat, trends } from "@/lib/mock-data";
 import { RegionFilter } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 
 const GEO_URL = "/world-110m.json";
+const MAP_WIDTH = 860;
+const MAP_HEIGHT = 420;
+const MAP_PADDING = 18;
 
 const regionOptions: RegionFilter[] = [
   "Hele verden",
@@ -18,6 +22,22 @@ const regionOptions: RegionFilter[] = [
   "Afrika",
   "Oseania",
 ];
+
+type MapFeature = {
+  id?: string | number;
+  properties: Record<string, unknown>;
+};
+
+type WorldTopology = {
+  objects: {
+    countries: object;
+  };
+};
+
+function normalizeNumericCode(value: string | number) {
+  const normalized = Number(value);
+  return Number.isNaN(normalized) ? String(value) : String(normalized);
+}
 
 /** ISO alpha-2 → numeric string used in world-atlas topojson */
 const alpha2ToNumeric: Record<string, string> = {
@@ -38,17 +58,6 @@ const alpha2ToNumeric: Record<string, string> = {
   AU: "036",
 };
 
-/** Region zoom/center presets */
-const regionView: Record<RegionFilter, { center: [number, number]; zoom: number }> = {
-  "Hele verden":   { center: [10, 10],   zoom: 1 },
-  "Nord-Amerika":  { center: [-100, 40], zoom: 2.8 },
-  "Sor-Amerika":   { center: [-60, -15], zoom: 2.8 },
-  Europa:          { center: [15, 52],   zoom: 4.5 },
-  Asia:            { center: [100, 30],  zoom: 2.6 },
-  Afrika:          { center: [20, 5],    zoom: 2.8 },
-  Oseania:         { center: [140, -25], zoom: 3.2 },
-};
-
 function heatToColor(heat: number, selected: boolean): string {
   if (selected) return "rgba(34,211,238,0.85)";
   if (heat >= 85) return "rgba(34,211,238,0.55)";
@@ -65,12 +74,39 @@ export function WorldMap() {
   const [selectedRegion, setSelectedRegion] = useState<RegionFilter>("Hele verden");
   const [selectedCodes, setSelectedCodes] = useState<string[]>([countryHeat[0]?.code ?? ""]);
   const [tooltip, setTooltip] = useState<{ name: string; heat: number } | null>(null);
+  const [geographies, setGeographies] = useState<MapFeature[]>([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadGeographies() {
+      const response = await fetch(GEO_URL);
+      const topology = (await response.json()) as WorldTopology;
+      const collection = feature(topology as never, topology.objects.countries as never);
+
+      if (!active || !("features" in collection)) {
+        return;
+      }
+
+      setGeographies(collection.features as MapFeature[]);
+    }
+
+    loadGeographies().catch(() => {
+      if (active) {
+        setGeographies([]);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const numericToCountry = useMemo(() => {
     const map = new Map<string, (typeof countryHeat)[number]>();
     for (const c of countryHeat) {
       const num = alpha2ToNumeric[c.code];
-      if (num) map.set(num, c);
+      if (num) map.set(normalizeNumericCode(num), c);
     }
     return map;
   }, []);
@@ -95,6 +131,44 @@ export function WorldMap() {
     [effectiveSelectedCodes, visibleCountries]
   );
 
+  const visibleNumericCodes = useMemo(
+    () =>
+      new Set(
+        visibleCountries
+          .map((country) => alpha2ToNumeric[country.code])
+          .filter((value): value is string => Boolean(value))
+          .map((value) => normalizeNumericCode(value))
+      ),
+    [visibleCountries]
+  );
+
+  const projection = useMemo(() => {
+    const baseProjection = geoNaturalEarth1();
+    const regionGeographies =
+      selectedRegion === "Hele verden"
+        ? geographies
+        : geographies.filter((geo) => geo.id !== undefined && visibleNumericCodes.has(normalizeNumericCode(geo.id)));
+
+    const targetGeographies = regionGeographies.length > 0 ? regionGeographies : geographies;
+
+    if (targetGeographies.length === 0) {
+      return baseProjection;
+    }
+
+    return baseProjection.fitExtent(
+      [
+        [MAP_PADDING, MAP_PADDING],
+        [MAP_WIDTH - MAP_PADDING, MAP_HEIGHT - MAP_PADDING],
+      ],
+      {
+        type: "FeatureCollection",
+        features: targetGeographies,
+      } as never
+    );
+  }, [geographies, selectedRegion, visibleNumericCodes]);
+
+  const pathGenerator = useMemo(() => geoPath(projection), [projection]);
+
   const aggregatedTrends = useMemo(() => {
     const byName = new Map(trends.map((t) => [t.name, t]));
     return selectedCountries
@@ -112,8 +186,6 @@ export function WorldMap() {
       return [...cur, code];
     });
   }
-
-  const { center, zoom } = regionView[selectedRegion];
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
@@ -150,55 +222,53 @@ export function WorldMap() {
             </div>
           )}
 
-          <ComposableMap
-            projectionConfig={{ rotate: [-10, 0, 0], scale: 147 }}
+          <svg
+            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
             className="h-[380px] w-full"
+            role="img"
+            aria-label="Verdenskart med markeder"
           >
-            <ZoomableGroup
-              center={center}
-              zoom={zoom}
-              maxZoom={8}
-              minZoom={1}
-            >
-              <Geographies geography={GEO_URL}>
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {({ geographies }: { geographies: any[] }) =>
-                  geographies.map((geo) => {
-                    const countryData = numericToCountry.get(String(geo.id));
-                    const isActive =
-                      countryData !== undefined &&
-                      effectiveSelectedCodes.includes(countryData.code) &&
-                      visibleCountries.some((c) => c.code === countryData.code);
-                    const heat = countryData?.heat ?? 0;
-                    const fill = heat > 0 ? heatToColor(heat, isActive) : "rgba(255,255,255,0.04)";
-                    const stroke = heat > 0 ? heatToStroke(isActive) : "rgba(255,255,255,0.08)";
+            {geographies.map((geo, index) => {
+              if (geo.id === undefined) {
+                return null;
+              }
 
-                    return (
-                      <Geography
-                        key={geo.rsmKey}
-                        geography={geo}
-                        fill={fill}
-                        stroke={stroke}
-                        strokeWidth={0.5}
-                        style={{
-                          default: { outline: "none", cursor: heat > 0 ? "pointer" : "default" },
-                          hover:   { outline: "none", fill: heat > 0 ? "rgba(34,211,238,0.55)" : "rgba(255,255,255,0.07)", cursor: heat > 0 ? "pointer" : "default" },
-                          pressed: { outline: "none" },
-                        }}
-                        onMouseEnter={() => {
-                          if (countryData) setTooltip({ name: countryData.country, heat: countryData.heat });
-                        }}
-                        onMouseLeave={() => setTooltip(null)}
-                        onClick={() => {
-                          if (countryData) toggleCountry(countryData.code);
-                        }}
-                      />
-                    );
-                  })
-                }
-              </Geographies>
-            </ZoomableGroup>
-          </ComposableMap>
+              const countryData = numericToCountry.get(normalizeNumericCode(geo.id));
+              const isVisible = countryData !== undefined && visibleNumericCodes.has(normalizeNumericCode(geo.id));
+              const isActive = countryData !== undefined && isVisible && effectiveSelectedCodes.includes(countryData.code);
+              const heat = isVisible ? (countryData?.heat ?? 0) : 0;
+              const fill = heat > 0 ? heatToColor(heat, isActive) : "rgba(255,255,255,0.04)";
+              const stroke = heat > 0 ? heatToStroke(isActive) : "rgba(255,255,255,0.08)";
+              const path = pathGenerator(geo as never);
+
+              if (!path) {
+                return null;
+              }
+
+              return (
+                <path
+                  key={`${String(geo.id)}-${index}`}
+                  d={path}
+                  fill={fill}
+                  stroke={stroke}
+                  strokeWidth={0.5}
+                  vectorEffect="non-scaling-stroke"
+                  className={heat > 0 ? "cursor-pointer transition-colors" : "transition-colors"}
+                  onMouseEnter={() => {
+                    if (countryData && isVisible) {
+                      setTooltip({ name: countryData.country, heat: countryData.heat });
+                    }
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                  onClick={() => {
+                    if (countryData && isVisible) {
+                      toggleCountry(countryData.code);
+                    }
+                  }}
+                />
+              );
+            })}
+          </svg>
 
           {/* Heat legend */}
           <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[10px] text-zinc-400">
@@ -288,5 +358,3 @@ export function WorldMap() {
     </div>
   );
 }
-
-
