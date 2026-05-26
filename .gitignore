@@ -1,0 +1,5 @@
+.next
+node_modules
+_db_migration
+*.tsbuildinfo
+.env.local
