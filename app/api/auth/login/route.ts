@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   AUTH_ACCOUNT_COOKIE_NAME,
   AUTH_COOKIE_NAME,
+  createAccountToken,
   createSessionToken,
+  getAccountDuration,
   getSessionDuration,
   isEmailAllowed,
   validateEmail,
@@ -30,13 +32,22 @@ export async function POST(request: NextRequest) {
   }
 
   const accountToken = request.cookies.get(AUTH_ACCOUNT_COOKIE_NAME)?.value;
-  const valid = await verifyAccountCredentials(accountToken, email, password);
+  let activeAccountToken: string | null | undefined = accountToken;
 
-  if (!valid) {
-    return NextResponse.json(
-      { message: "Fant ikke konto eller feil passord. Registrer deg forst." },
-      { status: 401 }
-    );
+  if (!activeAccountToken) {
+    activeAccountToken = await createAccountToken(email, password);
+    if (!activeAccountToken) {
+      return NextResponse.json(
+        { message: "Kunne ikke opprette konto. Sett AUTH_SECRET i miljo-variabler." },
+        { status: 500 }
+      );
+    }
+  } else {
+    const valid = await verifyAccountCredentials(activeAccountToken, email, password);
+
+    if (!valid) {
+      return NextResponse.json({ message: "Feil epost eller passord" }, { status: 401 });
+    }
   }
 
   const sessionToken = await createSessionToken(email);
@@ -57,6 +68,16 @@ export async function POST(request: NextRequest) {
     sameSite: "strict",
     path: "/",
     maxAge: getSessionDuration(),
+  });
+
+  response.cookies.set({
+    name: AUTH_ACCOUNT_COOKIE_NAME,
+    value: activeAccountToken,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: getAccountDuration(),
   });
 
   return response;
